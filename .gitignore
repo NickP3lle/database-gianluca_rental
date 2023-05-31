@@ -396,3 +396,12 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+**/*.cmi
+**/*.cmo
+**/*.cmx
+**/*.mli
+**/*.o
+srcs/polynomial_resolver
+# Drawio backup files
+**/.$*.drawio.bkp
