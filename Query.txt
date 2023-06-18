@@ -1,0 +1,35 @@
+Tutte le auto con massimale >=10M
+	select A.Targa,A.Modello, A.posto_parcheggio from autoveicolo as A
+	join Polizza as P on P.targa= A.targa;
+
+Tutte le auto parcheggiate a X, indirizzo Y dell'anno 1969
+	select Targa,Modello, posto_parcheggio from autoveicolo as A
+	join parcheggio as P on P.citta=A.citta_parcheggio and P.indirizzo=A.indirizzo_parcheggio
+	where A.anno=1969;
+
+Tutti i fornitori che hanno fornito auto di lusso del 2020 in ordine di quantità di pezzi
+	select F.Nome, count(*) from Fornitori as F
+	join Autoveicoli as A on A.marca= F.nome
+	where A.lusso=true and A.anno=2020
+	group by count(F.nome)
+	order by count(F.nome);
+
+Tutte le auto noleggiate tra il 18-06-2022 al 18-06-2023
+	select * from Noleggio where data_inizio>="2022-06-18" and data_inizio<"2023-06-18"
+
+Tutti i clienti con la patente scaduta 
+	select * from cliente as C
+	join Pantente as P on P.CF=C.CF
+	where data_scadenza<"2023-06-18";
+
+Il lavoratore che ha venduto più veicoli
+	Select *, count(*) from lavoratore
+	order by count(*)
+	Limit 1;
+
+Clienti che hanno noleggiato un auto di lusso con il lavoratore ID=1
+	Select * from Cliente as C
+	join Noleggio as N on N.CF=C.CF
+	join Autoveicolo as A on N.targa=A.targa
+	join Lavoratore as L on L.ID=N.ID_lavoratore
+	where A.lusso=true and L.ID_lavoratore=1;
