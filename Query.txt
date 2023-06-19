@@ -1,35 +1,59 @@
 Tutte le auto con massimale >=10M
-	select A.Targa,A.Modello, A.posto_parcheggio from autoveicolo as A
-	join Polizza as P on P.targa= A.targa;
+	SELECT A.targa, A.marca, A.modello, A.tipo_veicolo
+	FROM autoveicolo AS A
+	JOIN Polizza as P
+	ON P.targa = A.targa
+	WHERE P.massimale >= 10000000;
 
-Tutte le auto parcheggiate a X, indirizzo Y dell'anno 1969
-	select Targa,Modello, posto_parcheggio from autoveicolo as A
-	join parcheggio as P on P.citta=A.citta_parcheggio and P.indirizzo=A.indirizzo_parcheggio
-	where A.anno=1969;
+Trovare i parcheggi con almeno un veicolo parcheggiato
+	SELECT indirizzo, citta, count(*) AS numVeicoli
+	FROM parcheggio AS P
+	LEFT JOIN autoveicolo AS A
+	ON P.indirizzo = A.indirizzo_parcheggio AND P.citta = A.citta_parcheggio
+	GROUP BY indirizzo,citta
+	HAVING count(*) > 0
+	ORDER BY numVeicoli DESC
 
-Tutti i fornitori che hanno fornito auto di lusso del 2020 in ordine di quantità di pezzi
-	select F.Nome, count(*) from Fornitori as F
-	join Autoveicoli as A on A.marca= F.nome
-	where A.lusso=true and A.anno=2020
-	group by count(F.nome)
-	order by count(F.nome);
-
-Tutte le auto noleggiate tra il 18-06-2022 al 18-06-2023
-	select * from Noleggio where data_inizio>="2022-06-18" and data_inizio<"2023-06-18"
+I fornitori in ordine di quantità di veicoli consegnati
+	SELECT A.marca as fornitore, F.citta, F.indirizzo, COUNT(*) AS numElementiForniti
+	FROM autoveicolo AS A
+	JOIN fornitore AS F
+	ON A.marca = F.nome
+	GROUP BY A.marca, F.citta, F.indirizzo
+	ORDER BY numElementiForniti DESC
 
 Tutti i clienti con la patente scaduta 
-	select * from cliente as C
-	join Pantente as P on P.CF=C.CF
-	where data_scadenza<"2023-06-18";
+	SELECT DISTINCT C.cognome, C.nome, C.cf, C.email, C.telefono, C.email, C.inizio_cliente 
+	FROM cliente AS C
+	JOIN patente AS P
+	ON P.CF = C.CF
+	WHERE data_scadenza < '2023-06-18'
+	ORDER BY C.cognome, C.nome
 
 Il lavoratore che ha venduto più veicoli
-	Select *, count(*) from lavoratore
-	order by count(*)
-	Limit 1;
+	SELECT id_lavoratore, nome, cognome, count(*) as numVendite
+	FROM acquisto
+	JOIN lavoratore
+	ON acquisto.id_lavoratore = lavoratore.id
+	GROUP BY id_lavoratore, nome, cognome
+	ORDER BY numVendite DESC
+	LIMIT 1
 
-Clienti che hanno noleggiato un auto di lusso con il lavoratore ID=1
-	Select * from Cliente as C
-	join Noleggio as N on N.CF=C.CF
-	join Autoveicolo as A on N.targa=A.targa
-	join Lavoratore as L on L.ID=N.ID_lavoratore
-	where A.lusso=true and L.ID_lavoratore=1;
+Trovare i clienti piu fedeli che sono clienti da prima del 2010 e che hanno noleggiato almeno due macchine o comprato un'auto
+
+
+
+
+Query parametrica:
+Dato un id di un noleggio trovare quanto deve pagare
+
+Clienti che hanno noleggiato un auto di lusso con il lavoratore ID=2
+	SELECT C.nome, C.cognome, C.cf, C.sesso, C.email, C.telefono
+	FROM Cliente AS C
+	JOIN Noleggio AS N on N.CF = C.CF
+	JOIN Autoveicolo AS A ON N.targa = A.targa
+	JOIN Lavoratore AS L ON L.ID = N.ID_lavoratore
+	WHERE A.lusso=true AND N.ID_lavoratore = '2'
+
+Tutte le auto noleggiate nel periodo inserito dell'utente
+	select * from Noleggio where data_inizio>="2022-06-18" and data_inizio<"2023-06-18"
