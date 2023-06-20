@@ -40,20 +40,63 @@ Il lavoratore che ha venduto più veicoli
 	LIMIT 1
 
 Trovare i clienti piu fedeli che sono clienti da prima del 2010 e che hanno noleggiato almeno due macchine o comprato un'auto
+SELECT DISTINCT *
+FROM
+	((SELECT DISTINCT C.nome, C.cognome, C.cf, C.telefono, C.inizio_cliente
+	FROM cliente AS C
+	JOIN acquisto AS A
+	ON C.cf = A.cf)
+
+	UNION
+
+	(SELECT C.nome, C.cognome, C.cf, C.telefono, C.inizio_cliente
+	FROM cliente AS C
+	JOIN noleggio AS N
+	ON C.cf = N.cf
+	GROUP BY C.cf
+	HAVING count(*) >= 2)) as fedeli
+
+WHERE inizio_cliente <= '2010-12-31'
 
 
 
 
 Query parametrica:
 Dato un id di un noleggio trovare quanto deve pagare
+	SELECT N.codice as codiceNoleggio, A.targa, A.marca, A.modello, DATE_PART('day', AGE(N.data_fine, N.data_inizio)) * A.prezzo_giornaliero AS prezzoGiornaliero
+	FROM noleggio AS N
+	JOIN autoveicolo AS A
+	ON N.targa = A.targa
+	WHERE codice = '7'
 
-Clienti che hanno noleggiato un auto di lusso con il lavoratore ID=2
+Clienti che hanno noleggiato un auto di lusso dal lavoratore ID=2
 	SELECT C.nome, C.cognome, C.cf, C.sesso, C.email, C.telefono
 	FROM Cliente AS C
-	JOIN Noleggio AS N on N.CF = C.CF
+	JOIN Noleggio AS N ON N.CF = C.CF
 	JOIN Autoveicolo AS A ON N.targa = A.targa
 	JOIN Lavoratore AS L ON L.ID = N.ID_lavoratore
 	WHERE A.lusso=true AND N.ID_lavoratore = '2'
 
-Tutte le auto noleggiate nel periodo inserito dell'utente
-	select * from Noleggio where data_inizio>="2022-06-18" and data_inizio<"2023-06-18"
+Tutte le auto disponibili al noleggio nella data inserita dell'utente
+	SELECT targa, marca, modello
+	FROM autoveicolo
+	WHERE tipo_veicolo = 'AUTO' AND prezzo IS null
+
+	EXCEPT
+
+	(SELECT A.targa, A.marca, A.modello
+	FROM autoveicolo AS A
+	JOIN noleggio as N
+	ON A.targa = N.targa
+	WHERE N.data_inizio < '2018-03-01' AND N.data_fine > '2018-03-01')
+
+Trovare franchigia e massimale coperto dalla polizza del noleggio di un autoveicolo dato l'id del noleggio
+
+
+//questa si potrebbe anche non fare
+Dato il cf di una persona trovare tutti i suoi noleggi e acquisti
+
+
+
+
+Possibile index nella ricerca del prezzo dei noleggi
