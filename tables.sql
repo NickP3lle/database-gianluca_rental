@@ -379,3 +379,107 @@ INSERT INTO acquisto VALUES
 ('18', '2018-11-24', 'WM196TI', 'JVPISK44Y40F049B', '19'),
 ('19', '2003-04-27', 'AS689NK', 'QTOEHE30B14R971P', '20'),
 ('20', '2015-01-12', 'XP889ZR', 'BAKDFQ87U68B707M', '1');
+
+ALTER TABLE noleggio ADD CHECK (data_inizio <= data_fine);
+
+CREATE INDEX indexTipoVeicolo ON autoveicolo(modello, marca, tipo_veicolo)
+
+/* queries
+
+--1
+SELECT A.targa, A.marca, A.modello, A.tipo_veicolo
+FROM autoveicolo AS A
+JOIN Polizza as P
+ON P.targa = A.targa
+WHERE P.massimale >= 10000000
+
+--2
+SELECT A.marca as fornitore, F.citta, F.indirizzo, COUNT(*) AS numElementiForniti
+FROM autoveicolo AS A
+JOIN fornitore AS F
+ON A.marca = F.nome
+GROUP BY A.marca, F.citta, F.indirizzo
+ORDER BY numElementiForniti DESC
+
+--3
+SELECT DISTINCT C.cognome, C.nome, C.cf, C.email, C.telefono, C.email, C.inizio_cliente 
+FROM cliente AS C
+JOIN patente AS P
+ON P.CF = C.CF
+WHERE data_scadenza < '2023-06-18'
+ORDER BY C.cognome, C.nome
+
+--4
+SELECT id_lavoratore, nome, cognome, count(*) as numVendite
+FROM acquisto
+JOIN lavoratore
+ON acquisto.id_lavoratore = lavoratore.id
+GROUP BY id_lavoratore, nome, cognome
+ORDER BY numVendite DESC
+LIMIT 1
+
+--5
+SELECT indirizzo, citta, count(*) AS numVeicoli
+FROM parcheggio AS P
+LEFT JOIN autoveicolo AS A
+ON P.indirizzo = A.indirizzo_parcheggio AND P.citta = A.citta_parcheggio
+GROUP BY indirizzo,citta
+HAVING count(*) > 0
+ORDER BY numVeicoli DESC
+
+--6
+SELECT DISTINCT *
+FROM
+	((SELECT DISTINCT C.nome, C.cognome, C.cf, C.telefono, C.inizio_cliente
+	FROM cliente AS C
+	JOIN acquisto AS A
+	ON C.cf = A.cf)
+
+	UNION
+
+	(SELECT C.nome, C.cognome, C.cf, C.telefono, C.inizio_cliente
+	FROM cliente AS C
+	JOIN noleggio AS N
+	ON C.cf = N.cf
+	GROUP BY C.cf
+	HAVING count(*) >= 2)) as fedeli
+
+WHERE inizio_cliente <= '2010-12-31'
+
+--7
+SELECT C.nome, C.cognome, C.cf, C.sesso, C.email, C.telefono
+FROM Cliente AS C
+JOIN Noleggio AS N on N.CF = C.CF
+JOIN Autoveicolo AS A ON N.targa = A.targa
+JOIN Lavoratore AS L ON L.ID = N.ID_lavoratore
+WHERE A.lusso=true AND N.ID_lavoratore = '1'
+
+--8
+SELECT P.numero_polizza, A.targa, P.massimale, P.franchigia
+FROM polizza AS P
+JOIN autoveicolo AS A
+ON P.targa = A.targa
+JOIN noleggio AS N
+ON A.targa = N.targa
+WHERE codice = '1'
+
+--9
+SELECT N.codice as codiceNoleggio, A.targa, A.marca, A.modello, DATE_PART('day', AGE(N.data_fine, N.data_inizio)) * A.prezzo_giornaliero AS prezzoGiornaliero
+FROM noleggio AS N
+JOIN autoveicolo AS A
+ON N.targa = A.targa
+WHERE codice = '7'
+
+--10
+SELECT targa, marca, modello
+FROM autoveicolo
+WHERE tipo_veicolo = 'AUTO' AND prezzo IS null
+
+EXCEPT
+
+(SELECT A.targa, A.marca, A.modello
+FROM autoveicolo AS A
+JOIN noleggio as N
+ON A.targa = N.targa
+WHERE N.data_inizio < '2018-03-01' AND N.data_fine > '2018-03-01')
+*/
