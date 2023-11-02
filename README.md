@@ -1,4 +1,5 @@
-# database_noleggio
-Database project: creation of a database for the management of a dealership and vehicle rental
+# Gianluca's Rental
 
-Progetto di basi di dati: creazione di un database per la gestione di una concessionaria e noleggio di autoveicoli
+Gianluca's rental is a database service finalized to manage Gianluca's dealership and vehicle rental.
+
+This project was developed by Nicolò Pellegrinelli and Alessandro Benin for the database course project at UniPD
